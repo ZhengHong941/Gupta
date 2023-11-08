@@ -20,4 +20,8 @@
 
 //port 20 clip on brain broken
 
+//pid valules
+#define base_kp 5
+#define base_kd 1
+
 #endif
