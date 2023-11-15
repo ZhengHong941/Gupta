@@ -6,9 +6,9 @@
 #define lft_port 2
 #define lbb_port 10
 #define lbt_port 9
-#define rfb_port 16
-#define rft_port 17
-#define rbb_port 18
+#define rfb_port 17
+#define rft_port 18
+#define rbb_port 20
 #define rbt_port 19
 
 //intake
@@ -21,7 +21,7 @@
 //port 20 clip on brain broken
 
 //pid valules
-#define base_kp 5
-#define base_kd 1
+#define base_kp 7
+#define base_kd 0
 
 #endif

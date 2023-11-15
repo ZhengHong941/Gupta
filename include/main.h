@@ -63,6 +63,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+void pidmove(double, double);
+//void encoder_reset(void);
+//void base_break(void);
 void autonomous(void);
 void initialize(void);
 void disabled(void);
