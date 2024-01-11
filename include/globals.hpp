@@ -11,17 +11,27 @@
 #define rbb_port 20
 #define rbt_port 19
 
-//intake
-// #define intake_port 
+//value of pi
+#define pi 3.14159265358979
 
-//cascade
-// #define dpl_port 
-// #define dpr_port 
+//omniwheel diameter is about 28 mm
+#define tw_diameter 28.5
+// distance between omniwheel is about 232 to 235 mm
+#define base_diameter 232
 
-//port 20 clip on brain broken
+#define base_error 2
+#define base_max_rpm 400
+#define turn_max_rpm 250
 
 //pid valules
-#define base_kp 7
+#define base_kp 1
+#define base_ki 0
 #define base_kd 0
+
+//base pid - turning
+#define turn_kp 1
+#define turn_ki 0
+#define turn_kd 0
+
 
 #endif
