@@ -36,6 +36,7 @@
 
 #include "api.h"
 #include "globals.hpp"
+#include "base.hpp"
 
 /**
  * You should add more #includes here
@@ -63,6 +64,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void autonomous(void);
 void initialize(void);
 void disabled(void);
