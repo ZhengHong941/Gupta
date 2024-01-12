@@ -11,6 +11,9 @@
 #define rbb_port 20
 #define rbt_port 19
 
+#define twl_port 1
+#define twr_port 2
+
 //value of pi
 #define pi 3.14159265358979
 
@@ -32,6 +35,8 @@
 #define turn_kp 1
 #define turn_ki 0
 #define turn_kd 0
+
+#define intake_roller_port 1
 
 
 #endif

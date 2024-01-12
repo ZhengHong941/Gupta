@@ -18,6 +18,8 @@ void initialize() {
 	pros::Motor rft_base(rft_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbb_base(rbb_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbt_base(rbt_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
+
+	pros::Motor intake_roller(intake_roller_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 }
 
 void disabled() {}
@@ -39,6 +41,8 @@ void opcontrol() {
 	pros::Motor rft_base(rft_port);
 	pros::Motor rbb_base(rbb_port);
 	pros::Motor rbt_base(rbt_port);
+
+	pros::Motor intake_roller(intake_roller_port);
 	
 	bool tankdrive = false; //drive mode control
 	double left, right;
@@ -65,5 +69,15 @@ void opcontrol() {
         rft_base.move(right);
         rbb_base.move(right);
 		rbt_base.move(right);
+
+		if(master.get_digital(DIGITAL_L2)) {
+			intake_roller.move(127);
+		}
+		else if (master.get_digital(DIGITAL_L1)) {
+			intake_roller.move(-127);
+		}
+		else {
+			intake_roller.move(0);
+		}
 	}
 }
