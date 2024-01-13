@@ -20,13 +20,16 @@ void initialize() {
 	pros::Motor rbt_base(rbt_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 	pros::Motor intake_roller(intake_roller_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
+	pros::Motor puncher(puncher_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 }
 
 void disabled() {}
 
 void competition_initialize() {}
 
-void autonomous() {}
+void autonomous() {
+	forward_pid(600, 600);
+}
 
 void opcontrol() {
 	//controller
@@ -43,6 +46,7 @@ void opcontrol() {
 	pros::Motor rbt_base(rbt_port);
 
 	pros::Motor intake_roller(intake_roller_port);
+	pros::Motor puncher(puncher_port);
 	
 	bool tankdrive = false; //drive mode control
 	double left, right;
@@ -70,14 +74,18 @@ void opcontrol() {
         rbb_base.move(right);
 		rbt_base.move(right);
 
-		if(master.get_digital(DIGITAL_L2)) {
-			intake_roller.move(127);
+		if(master.get_digital(DIGITAL_L1)) {
+			intake_roller.move(120);
 		}
-		else if (master.get_digital(DIGITAL_L1)) {
-			intake_roller.move(-127);
+		else if (master.get_digital(DIGITAL_L2)) {
+			intake_roller.move(-120);
 		}
 		else {
 			intake_roller.move(0);
+		}
+
+		if(master.get_digital(DIGITAL_R1)) {
+			puncher.move(120);
 		}
 	}
 }
