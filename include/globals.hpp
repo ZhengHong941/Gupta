@@ -4,7 +4,7 @@
 //base
 #define lfb_port 7
 #define lft_port 12
-#define lbb_port 2
+#define lbb_port 5
 #define lbt_port 13
 #define rfb_port 11
 #define rft_port 15
@@ -18,21 +18,21 @@
 #define pi 3.14159265358979
 
 //omniwheel diameter is about 28 mm
-#define tw_diameter 28.5
+#define tw_diameter 29
 // distance between omniwheel is about 232 to 235 mm
-#define base_diameter 232
+#define base_diameter 197
 
 #define base_error 2
-#define base_max_rpm 400
+// #define base_max_rpm 300
 #define turn_max_rpm 250
 
 //pid valules
-#define base_kp 1
+#define base_kp 1.5
 #define base_ki 0
-#define base_kd 0
+#define base_kd 5
 
 //base pid - turning
-#define turn_kp 1
+#define turn_kp 3
 #define turn_ki 0
 #define turn_kd 0
 

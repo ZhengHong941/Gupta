@@ -4,6 +4,39 @@
 #include "pros/misc.h"
 #include "pros/motors.h"
 
+bool l_brake = false;
+bool r_brake = false;
+
+void left_brake() {
+	pros::Motor lfb_base(lfb_port);
+	pros::Motor lft_base(lft_port);
+	pros::Motor lbb_base(lbb_port);
+	pros::Motor lbt_base(lbt_port);
+	while (true) {
+		while(l_brake){
+			lft_base.brake();
+			lfb_base.brake();
+			lbt_base.brake();
+			lbb_base.brake();
+			pros::delay(2);
+		}
+	}
+}
+void right_brake() {
+	pros::Motor rfb_base(rfb_port);
+	pros::Motor rft_base(rft_port);
+	pros::Motor rbb_base(rbb_port);
+	pros::Motor rbt_base(rbt_port);
+	while (true) {
+		while (r_brake) {
+			rft_base.brake();
+			rfb_base.brake();
+			rbt_base.brake();
+			rbb_base.brake();
+			pros::delay(2);
+		}
+	}
+}
 
 void initialize() {
 	//controller
@@ -18,9 +51,20 @@ void initialize() {
 	pros::Motor rft_base(rft_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbb_base(rbb_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbt_base(rbt_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
+	lft_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	lfb_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	lbb_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	lbt_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	rft_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	rfb_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	rbb_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	rbt_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	pros::Motor intake_roller(intake_roller_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor puncher(puncher_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
+
+	pros::Task leftbrake(left_brake);
+	pros::Task rightbrake(right_brake);
 }
 
 void disabled() {}
@@ -28,7 +72,72 @@ void disabled() {}
 void competition_initialize() {}
 
 void autonomous() {
-	forward_pid(600, 600);
+	//base
+    pros::Motor lfb_base(lfb_port);
+	pros::Motor lft_base(lft_port);
+	pros::Motor lbb_base(lbb_port);
+	pros::Motor lbt_base(lbt_port);
+	pros::Motor rfb_base(rfb_port);
+	pros::Motor rft_base(rft_port);
+	pros::Motor rbb_base(rbb_port);
+	pros::Motor rbt_base(rbt_port);
+	
+
+	int power = -600;
+	lft_base.move_velocity(power);
+	lfb_base.move_velocity(power);
+	lbt_base.move_velocity(power);
+	lbb_base.move_velocity(power);
+	rft_base.move_velocity(power);
+	rfb_base.move_velocity(power);
+	rbt_base.move_velocity(power);
+	rbb_base.move_velocity(power);
+	std::cout << "back" << std::endl;
+	pros::delay(200);
+
+	power = 0;
+	lft_base.move_velocity(power);
+	lfb_base.move_velocity(power);
+	lbt_base.move_velocity(power);
+	lbb_base.move_velocity(power);
+	rft_base.move_velocity(power);
+	rfb_base.move_velocity(power);
+	rbt_base.move_velocity(power);
+	rbb_base.move_velocity(power);
+	std::cout << "forward" << std::endl;
+	pros::delay(2);
+
+	l_brake = true;
+	r_brake = true;
+
+	// power = -600;
+	// lft_base.move_velocity(power);
+	// lfb_base.move_velocity(power);
+	// lbt_base.move_velocity(power);
+	// lbb_base.move_velocity(power);
+	// rft_base.move_velocity(power);
+	// rfb_base.move_velocity(power);
+	// rbt_base.move_velocity(power);
+	// rbb_base.move_velocity(power);
+	// std::cout << "back" << std::endl;
+	// pros::delay(1000);
+
+	// power = 0;
+	// lft_base.move_velocity(power);
+	// lfb_base.move_velocity(power);
+	// lbt_base.move_velocity(power);
+	// lbb_base.move_velocity(power);
+	// rft_base.move_velocity(power);
+	// rfb_base.move_velocity(power);
+	// rbt_base.move_velocity(power);
+	// rbb_base.move_velocity(power);
+	// std::cout << "stop" << std::endl;
+	// pros::delay(1000);
+
+	// forward_pid(500, 500, 300);
+
+	// turn_pid(90, true);
+	// forward_pid(1300, 1300, 300);
 }
 
 void opcontrol() {
@@ -85,7 +194,10 @@ void opcontrol() {
 		}
 
 		if(master.get_digital(DIGITAL_R1)) {
-			puncher.move(120);
+			puncher.move(-120);
+		}
+		else {
+			puncher.move(0);
 		}
 	}
 }
