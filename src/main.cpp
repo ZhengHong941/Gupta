@@ -38,6 +38,63 @@ void right_brake() {
 	}
 }
 
+void base_move(int power, int delay) {
+	//base
+    pros::Motor lfb_base(lfb_port);
+	pros::Motor lft_base(lft_port);
+	pros::Motor lbb_base(lbb_port);
+	pros::Motor lbt_base(lbt_port);
+	pros::Motor rfb_base(rfb_port);
+	pros::Motor rft_base(rft_port);
+	pros::Motor rbb_base(rbb_port);
+	pros::Motor rbt_base(rbt_port);
+
+	if (!l_brake) {
+		lft_base.move_velocity(power);
+		lfb_base.move_velocity(power);
+		lbt_base.move_velocity(power);
+		lbb_base.move_velocity(power);
+	}
+	else {
+		lft_base.move_velocity(0);
+		lfb_base.move_velocity(0);
+		lbt_base.move_velocity(0);
+		lbb_base.move_velocity(0);
+	}
+	if (!r_brake) {
+		rft_base.move_velocity(power);
+		rfb_base.move_velocity(power);
+		rbt_base.move_velocity(power);
+		rbb_base.move_velocity(power);
+	}
+	else {
+		rft_base.move_velocity(0);
+		rfb_base.move_velocity(0);
+		rbt_base.move_velocity(0);
+		rbb_base.move_velocity(0);
+	}
+	pros::delay(delay);
+}
+
+bool punch = false;
+
+void puncher() {
+	pros::Motor puncher(puncher_port);
+	double currentPos;
+	double startPos;
+	// puncher.move_relative(-1900, 70);
+	// while (true) {
+		// if (punch) {
+			// currentPos = puncher.get_position();
+			// puncher.move_relative();
+		// }
+		
+
+	// }
+
+
+}
+
 void initialize() {
 	//controller
     pros::Controller master(CONTROLLER_MASTER);
@@ -61,7 +118,7 @@ void initialize() {
 	rbt_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	pros::Motor intake_roller(intake_roller_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
-	pros::Motor puncher(puncher_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
+	pros::Motor puncher(puncher_port, pros::E_MOTOR_GEARSET_36, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 	pros::Task leftbrake(left_brake);
 	pros::Task rightbrake(right_brake);
@@ -72,40 +129,15 @@ void disabled() {}
 void competition_initialize() {}
 
 void autonomous() {
-	//base
-    pros::Motor lfb_base(lfb_port);
-	pros::Motor lft_base(lft_port);
-	pros::Motor lbb_base(lbb_port);
-	pros::Motor lbt_base(lbt_port);
-	pros::Motor rfb_base(rfb_port);
-	pros::Motor rft_base(rft_port);
-	pros::Motor rbb_base(rbb_port);
-	pros::Motor rbt_base(rbt_port);
-	
+	pros::Motor lfb_base(lfb_port);
 
-	int power = -600;
-	lft_base.move_velocity(power);
-	lfb_base.move_velocity(power);
-	lbt_base.move_velocity(power);
-	lbb_base.move_velocity(power);
-	rft_base.move_velocity(power);
-	rfb_base.move_velocity(power);
-	rbt_base.move_velocity(power);
-	rbb_base.move_velocity(power);
-	std::cout << "back" << std::endl;
-	pros::delay(200);
-
-	power = 0;
-	lft_base.move_velocity(power);
-	lfb_base.move_velocity(power);
-	lbt_base.move_velocity(power);
-	lbb_base.move_velocity(power);
-	rft_base.move_velocity(power);
-	rfb_base.move_velocity(power);
-	rbt_base.move_velocity(power);
-	rbb_base.move_velocity(power);
-	std::cout << "forward" << std::endl;
-	pros::delay(2);
+	base_move(-450, 400);
+	base_move(0, 700);
+	base_move(300, 100);
+	base_move(-300, 2000);
+	base_move(0, 1000);
+	std::cout << lfb_base.get_brake_mode() << std::endl;
+	pros::delay(100);
 
 	l_brake = true;
 	r_brake = true;
@@ -160,6 +192,9 @@ void opcontrol() {
 	bool tankdrive = false; //drive mode control
 	double left, right;
 	double power, turn;
+
+	bool puncher_rewind = true;
+
 	while(true){
         //base control
 		if(master.get_digital_new_press(DIGITAL_Y)) tankdrive = !tankdrive; //tank toggle
@@ -193,11 +228,23 @@ void opcontrol() {
 			intake_roller.move(0);
 		}
 
-		if(master.get_digital(DIGITAL_R1)) {
-			puncher.move(-120);
+		if(master.get_digital_new_press(DIGITAL_R1)) {
+			puncher.tare_position();
+			if (puncher_rewind) {
+				puncher.move_absolute(-1050, -70);
+				puncher_rewind = false;
+			}
+			// puncher.move(0);
+			// pros::delay(2);
 		}
-		else {
-			puncher.move(0);
+		std::cout << puncher.get_position() << std::endl;
+		
+		if(master.get_digital_new_press(DIGITAL_R2)) {
+			puncher.move_velocity(100);
+			pros::delay(200);
+			puncher.move_velocity(0);
+			puncher_rewind = true;
+
 		}
 	}
 }
