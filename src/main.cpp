@@ -74,25 +74,37 @@ void base_move(int power, int delay) {
 		rbb_base.move_velocity(0);
 	}
 	pros::delay(delay);
+	lft_base.move_velocity(0);
+	lfb_base.move_velocity(0);
+	lbt_base.move_velocity(0);
+	lbb_base.move_velocity(0);
+	rft_base.move_velocity(0);
+	rfb_base.move_velocity(0);
+	rbt_base.move_velocity(0);
+	rbb_base.move_velocity(0);
 }
 
 bool punch = false;
+bool puncher_rewind = true;
+bool puncher_lock = false;
 
-void puncher() {
+void puncher_function() {
 	pros::Motor puncher(puncher_port);
-	double currentPos;
-	double startPos;
-	// puncher.move_relative(-1900, 70);
-	// while (true) {
-		// if (punch) {
-			// currentPos = puncher.get_position();
-			// puncher.move_relative();
-		// }
-		
-
-	// }
-
-
+	
+	if (puncher_rewind) {
+		if (!puncher_lock) {
+			puncher.tare_position();
+			puncher.move_absolute(-1050, -70); // 1050 for full draw
+			puncher_lock = true;
+		}
+	}
+	else if (punch) {
+		puncher.move_velocity(100);
+		pros::delay(200);
+		puncher.move_velocity(0);
+		puncher_lock = false;
+		punch = false;
+	}
 }
 
 void initialize() {
@@ -122,6 +134,7 @@ void initialize() {
 
 	pros::Task leftbrake(left_brake);
 	pros::Task rightbrake(right_brake);
+	pros::Task puncher_task(puncher_function);
 }
 
 void disabled() {}
@@ -131,45 +144,26 @@ void competition_initialize() {}
 void autonomous() {
 	pros::Motor lfb_base(lfb_port);
 
-	base_move(-450, 400);
-	base_move(0, 700);
-	base_move(300, 100);
-	base_move(-300, 2000);
-	base_move(0, 1000);
-	std::cout << lfb_base.get_brake_mode() << std::endl;
-	pros::delay(100);
+	// base_move(-450, 400);
+	// base_move(0, 700);
+	// base_move(300, 100);
+	// base_move(-300, 2000);
+	// base_move(0, 1000);
+	// std::cout << lfb_base.get_brake_mode() << std::endl;
+	// pros::delay(100);
 
-	l_brake = true;
-	r_brake = true;
+	// l_brake = true;
+	// r_brake = true;
 
-	// power = -600;
-	// lft_base.move_velocity(power);
-	// lfb_base.move_velocity(power);
-	// lbt_base.move_velocity(power);
-	// lbb_base.move_velocity(power);
-	// rft_base.move_velocity(power);
-	// rfb_base.move_velocity(power);
-	// rbt_base.move_velocity(power);
-	// rbb_base.move_velocity(power);
-	// std::cout << "back" << std::endl;
-	// pros::delay(1000);
 
-	// power = 0;
-	// lft_base.move_velocity(power);
-	// lfb_base.move_velocity(power);
-	// lbt_base.move_velocity(power);
-	// lbb_base.move_velocity(power);
-	// rft_base.move_velocity(power);
-	// rfb_base.move_velocity(power);
-	// rbt_base.move_velocity(power);
-	// rbb_base.move_velocity(power);
-	// std::cout << "stop" << std::endl;
-	// pros::delay(1000);
 
-	// forward_pid(500, 500, 300);
+	forward_pid(-500, -500, 300);
+	turn_pid(90, false);
+	base_move(100, 400);
+	forward_pid(-1350, -1350, 400);
+	turn_pid(90, false);
+	base_move(100, 1000);
 
-	// turn_pid(90, true);
-	// forward_pid(1300, 1300, 300);
 }
 
 void opcontrol() {
@@ -192,8 +186,6 @@ void opcontrol() {
 	bool tankdrive = false; //drive mode control
 	double left, right;
 	double power, turn;
-
-	bool puncher_rewind = true;
 
 	while(true){
         //base control
@@ -228,23 +220,39 @@ void opcontrol() {
 			intake_roller.move(0);
 		}
 
-		if(master.get_digital_new_press(DIGITAL_R1)) {
-			puncher.tare_position();
-			if (puncher_rewind) {
-				puncher.move_absolute(-1050, -70);
-				puncher_rewind = false;
-			}
-			// puncher.move(0);
-			// pros::delay(2);
+		// if(master.get_digital(DIGITAL_UP) && master.get_digital_new_press(DIGITAL_R1)) {
+		// 	puncher.move_velocity(100);
+		// 	pros::delay(200);
+		// 	puncher.move_velocity(0);
+		// 	puncher_rewind = true;
+		// }
+		// if(master.get_digital(DIGITAL_DOWN)) {
+		// 	puncher.move(-100);
+		// 	pros::delay(2);
+		// }
+		// else {
+		// 	puncher.move(0);
+		// 	pros::delay(2);
+		// }
+
+		// if(master.get_digital_new_press(DIGITAL_R1)) {
+		// 	puncher.tare_position();
+		// 	if (puncher_rewind) {
+		// 		puncher.move_absolute(-1050, -70); // 1050 for full draw
+		// 		puncher_rewind = false;
+		// 	}
+		// }
+		if(master.get_digital_new_press(DIGITAL_R2)) {
+			punch = true;
 		}
+
 		std::cout << puncher.get_position() << std::endl;
 		
-		if(master.get_digital_new_press(DIGITAL_R2)) {
-			puncher.move_velocity(100);
-			pros::delay(200);
-			puncher.move_velocity(0);
-			puncher_rewind = true;
-
-		}
+		// if(master.get_digital_new_press(DIGITAL_R2)) {
+		// 	puncher.move_velocity(100);
+		// 	pros::delay(200);
+		// 	puncher.move_velocity(0);
+		// 	puncher_rewind = true;
+		// }
 	}
 }

@@ -100,11 +100,11 @@ void forward_pid(float TARGET_L, float TARGET_R, int base_max_rpm) {
 		// }
 
 		//cap max rpm
-		if (powerL >= base_max_rpm) {
-			powerL = base_max_rpm;
+		if ( fabs(powerL) >= base_max_rpm ) {
+			powerL = base_max_rpm * (powerL / fabs(powerL));
 		}
-		if (powerR >= base_max_rpm) {
-			powerR = base_max_rpm;
+		if ( fabs(powerR) >= base_max_rpm ) {
+			powerR = base_max_rpm * (powerR / fabs(powerR));
 		}
 
 		lft_base.move_velocity(powerL);
