@@ -12,7 +12,7 @@
 #define rbt_port 19
 
 #define twl_port 6
-#define twr_port 18
+#define twr_port 7
 
 //value of pi
 #define pi 3.14159265358979
@@ -36,8 +36,9 @@
 #define turn_ki 0
 #define turn_kd 0
 
-#define intake_roller_port 7
-#define puncher_port 16
+#define intake_roller_port 8
+#define puncher_rewind_port 16
+#define puncher_release_port 15
 
 
 #endif

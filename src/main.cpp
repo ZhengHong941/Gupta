@@ -84,26 +84,38 @@ void base_move(int power, int delay) {
 	rbb_base.move_velocity(0);
 }
 
+
+bool rewind_puncher = false;
 bool punch = false;
-bool puncher_rewind = true;
-bool puncher_lock = false;
+bool puncher_rewind;
+bool puncher_release;
 
 void puncher_function() {
-	pros::Motor puncher(puncher_port);
-	
-	if (puncher_rewind) {
-		if (!puncher_lock) {
-			puncher.tare_position();
-			puncher.move_absolute(-1050, -70); // 1050 for full draw
-			puncher_lock = true;
+	pros::Motor puncher_rewind(puncher_rewind_port);
+	pros::Motor puncher_release(puncher_release_port);
+
+	while(true){
+		if (punch) {
+			std::cout << "punching" << std::endl;
+			puncher_release.move_velocity(-100);
+			pros::delay(2000);
+			puncher_release.move_velocity(100);
+			pros::delay(300);
+			puncher_release.move_velocity(0);
+			punch = false;
+			rewind_puncher = true;
 		}
-	}
-	else if (punch) {
-		puncher.move_velocity(100);
-		pros::delay(200);
-		puncher.move_velocity(0);
-		puncher_lock = false;
-		punch = false;
+		if ( rewind_puncher && (!punch) ) {
+			puncher_rewind.tare_position();
+			while (puncher_rewind.get_position() < 1000) {	
+				puncher_rewind.move(120);
+				pros::delay(2);
+			}
+			puncher_rewind.move(0);
+			pros::delay(2);
+			rewind_puncher = false;
+		}
+		pros::delay(2);
 	}
 }
 
@@ -130,7 +142,8 @@ void initialize() {
 	rbt_base.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	pros::Motor intake_roller(intake_roller_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
-	pros::Motor puncher(puncher_port, pros::E_MOTOR_GEARSET_36, false, pros::E_MOTOR_ENCODER_DEGREES);
+	pros::Motor puncher_rewind(puncher_rewind_port, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
+	pros::Motor puncher_release(puncher_release_port, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 	pros::Task leftbrake(left_brake);
 	pros::Task rightbrake(right_brake);
@@ -144,25 +157,24 @@ void competition_initialize() {}
 void autonomous() {
 	pros::Motor lfb_base(lfb_port);
 
-	// base_move(-450, 400);
-	// base_move(0, 700);
-	// base_move(300, 100);
-	// base_move(-300, 2000);
-	// base_move(0, 1000);
-	// std::cout << lfb_base.get_brake_mode() << std::endl;
-	// pros::delay(100);
+	base_move(-450, 300);
+	// pros::delay(1000);
+	base_move(250, 500);
+	pros::delay(1000);
+	base_move(-200, 3000);
+	pros::delay(100);
 
-	// l_brake = true;
-	// r_brake = true;
-
+	l_brake = true;
+	r_brake = true;
 
 
-	forward_pid(-500, -500, 300);
-	turn_pid(90, false);
-	base_move(100, 400);
-	forward_pid(-1350, -1350, 400);
-	turn_pid(90, false);
-	base_move(100, 1000);
+
+	// forward_pid(-500, -500, 300);
+	// turn_pid(90, false);
+	// base_move(100, 400);
+	// forward_pid(-1350, -1350, 400);
+	// turn_pid(90, false);
+	// base_move(100, 1000);
 
 }
 
@@ -181,7 +193,8 @@ void opcontrol() {
 	pros::Motor rbt_base(rbt_port);
 
 	pros::Motor intake_roller(intake_roller_port);
-	pros::Motor puncher(puncher_port);
+	pros::Motor puncher_rewind(puncher_rewind_port);
+	pros::Motor puncher_release(puncher_release_port);
 	
 	bool tankdrive = false; //drive mode control
 	double left, right;
@@ -242,11 +255,22 @@ void opcontrol() {
 		// 		puncher_rewind = false;
 		// 	}
 		// }
+		// if(master.get_digital_new_press(DIGITAL_R1)) {
+		// 	rewind_puncher = true;
+		// }
+		if(master.get_digital(DIGITAL_UP)) {
+			puncher_rewind.move(127);
+			pros::delay(5);
+			puncher_rewind.move(0);
+			pros::delay(1);
+			rewind_puncher = false;
+		}
+
 		if(master.get_digital_new_press(DIGITAL_R2)) {
 			punch = true;
 		}
 
-		std::cout << puncher.get_position() << std::endl;
+		// std::cout << puncher.get_position() << std::endl;
 		
 		// if(master.get_digital_new_press(DIGITAL_R2)) {
 		// 	puncher.move_velocity(100);
