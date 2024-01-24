@@ -14,6 +14,9 @@ void forward_pid(float TARGET_L, float TARGET_R, int base_max_rpm) {
 	pros::Motor rft_base(rft_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbb_base(rbb_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbt_base(rbt_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
+	lft_base.tare_position();
+	rft_base.tare_position();
+	
 	pros::Rotation trackingwheel_l(twl_port);
 	pros::Rotation trackingwheel_r(twr_port);
 	trackingwheel_l.set_reversed(true);
@@ -47,6 +50,8 @@ void forward_pid(float TARGET_L, float TARGET_R, int base_max_rpm) {
 	// uint32_t current_time;
 
 	while(l_move || r_move){
+		// encdleft = lft_base.get_position() * pi * 69.85 / 360;
+		// encdright = rft_base.get_position() * pi * 69.85 / 360;
 		encdleft = trackingwheel_l.get_position() * pi * tw_diameter / 36000;
 		encdright = trackingwheel_r.get_position() * pi * tw_diameter / 36000;
 		errorLeft = TARGET_L - encdleft;
@@ -140,6 +145,9 @@ void turn_pid(double TARGET_ANGLE, bool clockwise) {
 	pros::Motor rft_base(rft_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbb_base(rbb_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
 	pros::Motor rbt_base(rbt_port, pros::E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_DEGREES);
+	lft_base.tare_position();
+	rft_base.tare_position();
+	
 	pros::Rotation trackingwheel_l(twl_port);
 	pros::Rotation trackingwheel_r(twr_port);
 	trackingwheel_l.set_reversed(true);
@@ -176,6 +184,8 @@ void turn_pid(double TARGET_ANGLE, bool clockwise) {
 	double TARGET_R = (-direction_l) * TARGET_ANGLE * pi * base_diameter / 360;
 
 	while(l_move || r_move){
+		// encdleft = lft_base.get_position() * pi * 69.85 / 360;
+		// encdright = rft_base.get_position() * pi * 69.85 / 360;
 		encdleft = trackingwheel_l.get_position() * pi * tw_diameter / 36000;
 		encdright = trackingwheel_r.get_position() * pi * tw_diameter / 36000;
 		errorLeft = TARGET_L - encdleft;

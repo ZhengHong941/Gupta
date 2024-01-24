@@ -2,17 +2,17 @@
 #define _GLOBALS_HPP_
 
 //base
-#define lfb_port 4
-#define lft_port 5
-#define lbb_port 2
-#define lbt_port 3
-#define rfb_port 9
-#define rft_port 8
+#define lfb_port 6
+#define lft_port 4
+#define lbb_port 1
+#define lbt_port 2
+#define rfb_port 18
+#define rft_port 17
 #define rbb_port 20
 #define rbt_port 19
 
-#define twl_port 6
-#define twr_port 7
+#define twl_port 12
+#define twr_port 11
 
 //value of pi
 #define pi 3.14159265358979
@@ -36,9 +36,9 @@
 #define turn_ki 0
 #define turn_kd 0
 
-#define intake_roller_port 8
-#define puncher_rewind_port 16
-#define puncher_release_port 15
+#define intake_roller_port 13
+#define puncher_rewind_port 15
+#define puncher_release_port 16
 
 
 #endif

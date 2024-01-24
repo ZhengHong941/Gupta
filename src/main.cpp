@@ -86,34 +86,39 @@ void base_move(int power, int delay) {
 
 
 bool rewind_puncher = false;
+bool puncher_auto = true;
 bool punch = false;
-bool puncher_rewind;
-bool puncher_release;
+uint32_t end_time;
 
 void puncher_function() {
 	pros::Motor puncher_rewind(puncher_rewind_port);
 	pros::Motor puncher_release(puncher_release_port);
 
 	while(true){
+
 		if (punch) {
 			std::cout << "punching" << std::endl;
-			puncher_release.move_velocity(-100);
-			pros::delay(2000);
-			puncher_release.move_velocity(100);
-			pros::delay(300);
-			puncher_release.move_velocity(0);
+			puncher_release.move(-127);
+			pros::delay(400);
+			puncher_release.move(127);
+			pros::delay(100);
+			puncher_release.move(0);
 			punch = false;
 			rewind_puncher = true;
 		}
-		if ( rewind_puncher && (!punch) ) {
-			puncher_rewind.tare_position();
-			while (puncher_rewind.get_position() < 1000) {	
-				puncher_rewind.move(120);
+		
+		if (rewind_puncher && (puncher_auto)) {
+			// puncher_rewind.tare_position();
+			puncher_rewind.move(127);
+			pros::delay(100);
+			while (puncher_rewind.get_actual_velocity() > 0) {
+				puncher_rewind.move(127);
 				pros::delay(2);
 			}
 			puncher_rewind.move(0);
 			pros::delay(2);
 			rewind_puncher = false;
+			end_time = pros::millis();
 		}
 		pros::delay(2);
 	}
@@ -157,24 +162,15 @@ void competition_initialize() {}
 void autonomous() {
 	pros::Motor lfb_base(lfb_port);
 
-	base_move(-450, 300);
-	// pros::delay(1000);
-	base_move(250, 500);
-	pros::delay(1000);
-	base_move(-200, 3000);
-	pros::delay(100);
-
-	l_brake = true;
-	r_brake = true;
-
-
-
-	// forward_pid(-500, -500, 300);
-	// turn_pid(90, false);
-	// base_move(100, 400);
-	// forward_pid(-1350, -1350, 400);
-	// turn_pid(90, false);
-	// base_move(100, 1000);
+	punch = true;
+	pros::delay(2000);
+	forward_pid(-800, -800, 600);
+	forward_pid(-500, -500, 300);
+	turn_pid(90, true);
+	base_move(100, 400);
+	forward_pid(-1350, -1350, 400);
+	turn_pid(90, true);
+	base_move(100, 1000);
 
 }
 
@@ -199,6 +195,7 @@ void opcontrol() {
 	bool tankdrive = false; //drive mode control
 	double left, right;
 	double power, turn;
+	int cam = 0;
 
 	while(true){
         //base control
@@ -233,31 +230,6 @@ void opcontrol() {
 			intake_roller.move(0);
 		}
 
-		// if(master.get_digital(DIGITAL_UP) && master.get_digital_new_press(DIGITAL_R1)) {
-		// 	puncher.move_velocity(100);
-		// 	pros::delay(200);
-		// 	puncher.move_velocity(0);
-		// 	puncher_rewind = true;
-		// }
-		// if(master.get_digital(DIGITAL_DOWN)) {
-		// 	puncher.move(-100);
-		// 	pros::delay(2);
-		// }
-		// else {
-		// 	puncher.move(0);
-		// 	pros::delay(2);
-		// }
-
-		// if(master.get_digital_new_press(DIGITAL_R1)) {
-		// 	puncher.tare_position();
-		// 	if (puncher_rewind) {
-		// 		puncher.move_absolute(-1050, -70); // 1050 for full draw
-		// 		puncher_rewind = false;
-		// 	}
-		// }
-		// if(master.get_digital_new_press(DIGITAL_R1)) {
-		// 	rewind_puncher = true;
-		// }
 		if(master.get_digital(DIGITAL_UP)) {
 			puncher_rewind.move(127);
 			pros::delay(5);
@@ -266,17 +238,45 @@ void opcontrol() {
 			rewind_puncher = false;
 		}
 
-		if(master.get_digital_new_press(DIGITAL_R2)) {
-			punch = true;
+		if(master.get_digital_new_press(DIGITAL_DOWN)) {
+			puncher_auto = !puncher_auto;
+			pros::delay(2);
 		}
 
-		// std::cout << puncher.get_position() << std::endl;
-		
-		// if(master.get_digital_new_press(DIGITAL_R2)) {
-		// 	puncher.move_velocity(100);
-		// 	pros::delay(200);
-		// 	puncher.move_velocity(0);
-		// 	puncher_rewind = true;
+		if(master.get_digital_new_press(DIGITAL_R1)) {
+			rewind_puncher = true;
+			// std::cout << puncher_rewind.get_current_draw() << " : " << puncher_release.get_current_draw() << std::endl;
+		}
+		if(master.get_digital_new_press(DIGITAL_R2)) {
+			punch = true;
+			// std::cout << puncher_rewind.get_current_draw() << " : " << puncher_release.get_current_draw() << std::endl;
+		}
+		if(master.get_digital_new_press(DIGITAL_UP)) {
+			puncher_rewind.move(127);
+			pros::delay(10);
+			puncher_rewind.move(0);
+			pros::delay(2);
+		}
+		if(master.get_digital_new_press(DIGITAL_LEFT)) {
+			for (int i = 1; i <= 12; i++) {
+				uint32_t start_time = pros::millis();
+				punch = true;
+				pros::delay(1800);
+				std::cout << (end_time - start_time) << std::endl;
+				pros::delay(2);
+			}
+		}
+		// if(master.get_digital_new_press(DIGITAL_RIGHT)) {
+		// 	cam++;
+		// 	cam = cam % 3;
+		// 	if (cam == 1) {
+		// 		puncher_release.move(127);
+		// 	}
+		// 	else if (cam == 2) {
+		// 		puncher_release.move(0);
+		// 	}
+		// 	pros::delay(2);
 		// }
+		pros::delay(2);
 	}
 }
